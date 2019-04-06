@@ -27,6 +27,7 @@ public class FractalMaster : MonoBehaviour
     [Header ("Animation Settings")]
     public float powerIncreaseRate = 0.2f;
     public float oscillationRate = 0.2f;
+    public float oscillationRange = 5f;
     private float t = 0;
 
     private int handleCSMain;
@@ -61,7 +62,7 @@ public class FractalMaster : MonoBehaviour
             {
                 t = (t + (Time.deltaTime * oscillationRate)) % (2 * Mathf.PI);
 
-                fractalPower = 2f + Mathf.Cos(t);
+                fractalPower = 1f + oscillationRange * (1f + (Mathf.Cos(t + Mathf.PI)));
             }
         }
     }

@@ -288,4 +288,5 @@ MonoBehaviour:
   greenB: 0
   blueB: 0
   powerIncreaseRate: 0
-  oscillationRate: 0.5
+  oscillationRate: 0.2
+  oscillationRange: 5
