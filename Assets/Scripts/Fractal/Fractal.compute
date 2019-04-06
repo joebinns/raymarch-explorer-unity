@@ -85,8 +85,27 @@ float3 EstimateNormal(float3 p)
     return normalize(float3(x,y,z));
 }
 
-[numthreads(8,8,1)]
-void CSMain (uint3 id : SV_DispatchThreadID)
+struct minStruct
+{
+	uint xMin; // column of minimum
+	uint yMin; // row of minimum
+	float dMin; // minimum distance
+};
+
+RWStructuredBuffer<minStruct> GroupMinBuffer;
+groupshared minStruct rowMinData[64];
+
+[numthreads(64, 1, 1)]
+void CSMain(uint3 groupID : SV_GroupID,
+	// 3D ID of thread group; range depends on Dispatch call
+	uint3 groupThreadID : SV_GroupThreadID,
+	// 3D ID of thread in a thread group; range depends on numthreads
+	uint groupIndex : SV_GroupIndex,
+	// flattened/linearized SV_GroupThreadID. 
+	// groupIndex specifies the index within the group (0 to 63)
+	uint3 id : SV_DispatchThreadID)
+	// = SV_GroupID * numthreads + SV_GroupThreadID
+	// id.x specifies the row in the input texture image
 {
     uint width,height;
     Destination.GetDimensions(width, height);
@@ -94,7 +113,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float2 uv = id.xy / float2(width,height);
 
     // Background gradient
-    float4 result = lerp(float4(51,3,20,1),float4(16,6,28,1),uv.y)/255.0;
+    float4 result = lerp(float4(51, 3, 20, 1), float4(16, 6, 28, 1), uv.y) / 255.0;
     
     // Raymarching:
     Ray ray = CreateCameraRay(uv * 2 - 1);
@@ -126,4 +145,59 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     float rim = marchSteps/darkness;
     Destination[id.xy] = lerp(result, 1, blackAndWhite) * rim;
+
+
+	// find the minimum of this row 
+	// and store its data in rowMaxData[groupIndex]
+	rowMinData[groupIndex].xMin = 0;
+	rowMinData[groupIndex].yMin = id.x;
+	rowMinData[groupIndex].dMin = 1000;
+	if (rayDst < rowMinData[groupIndex].dMin)
+	{
+		rowMinData[groupIndex].xMin = id.y;
+		rowMinData[groupIndex].dMin = rayDst;
+	}
+
+	// find the minimum of this group
+	// and store its data in GroupMinBuffer[groupID.x]
+	GroupMemoryBarrierWithGroupSync();
+	// we have to wait for all writes to rowMinData by the group's threads
+	if (0 == (groupIndex & 1)) { // is groupIndex even?
+		if (rowMinData[groupIndex + 1].dMin < rowMinData[groupIndex].dMin) {
+			rowMinData[groupIndex] = rowMinData[groupIndex + 1];
+		}
+	}
+	GroupMemoryBarrierWithGroupSync();
+	if (0 == (groupIndex & 3)) { // is groupIndex divisible by 4?
+
+		if (rowMinData[groupIndex + 2].dMin < rowMinData[groupIndex].dMin) {
+			rowMinData[groupIndex] = rowMinData[groupIndex + 2];
+		}
+	}
+	GroupMemoryBarrierWithGroupSync();
+	if (0 == (groupIndex & 7)) { // is groupIndex divisible by 8?
+		if (rowMinData[groupIndex + 4].dMin < rowMinData[groupIndex].dMin) {
+			rowMinData[groupIndex] = rowMinData[groupIndex + 4];
+		}
+	}
+	GroupMemoryBarrierWithGroupSync();
+	if (0 == (groupIndex & 15)) { // is groupIndex divisible by 16?
+		if (rowMinData[groupIndex + 8].dMin < rowMinData[groupIndex].dMin) {
+			rowMinData[groupIndex] = rowMinData[groupIndex + 8];
+		}
+	}
+	GroupMemoryBarrierWithGroupSync();
+	if (0 == (groupIndex & 31)) { // is groupIndex divisible by 32?
+		if (rowMinData[groupIndex + 16].dMin < rowMinData[groupIndex].dMin) {
+			rowMinData[groupIndex] = rowMinData[groupIndex + 16];
+		}
+	}
+	GroupMemoryBarrierWithGroupSync();
+	if (0 == (groupIndex & 63)) { // is groupIndex divisible by 64?
+		if (rowMinData[groupIndex + 32].dMin < rowMinData[groupIndex].dMin) {
+			rowMinData[groupIndex] = rowMinData[groupIndex + 32];
+		}
+		GroupMinBuffer[groupID.x] = rowMinData[groupIndex];
+		// copy minimum of group to buffer
+	}
 }

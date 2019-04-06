@@ -32,6 +32,11 @@ public class FractalMaster : MonoBehaviour
 
     private int handleCSMain;
 
+    public uint[] groupMinData;
+    public int groupMin;
+
+    private ComputeBuffer groupMinBuffer;
+
     void Start()
     {
         Application.targetFrameRate = 60;
@@ -47,6 +52,12 @@ public class FractalMaster : MonoBehaviour
     {
         cam = Camera.current;
         directionalLight = FindObjectOfType<Light> ();
+    }
+
+    void InitBuffer()
+    {
+        groupMinBuffer = new ComputeBuffer((cam.pixelHeight + 63) / 64, (sizeof(uint) * 2) + (sizeof(float) * 1));
+        groupMinData = new uint[((cam.pixelHeight + 63) / 64) * 3];
     }
 
     // Animate properties
@@ -72,14 +83,35 @@ public class FractalMaster : MonoBehaviour
         handleCSMain = fractalShader.FindKernel("CSMain");
         Init();
         InitRenderTexture();
+
+        InitBuffer();
+
         SetParameters();
 
 
-        int threadGroupsX = Mathf.CeilToInt(cam.pixelWidth / 8.0f);     //CREATING A THREAD FOR EACH PIXEL (/8 AS IT'S *8 IN THE SHADER)
-        int threadGroupsY = Mathf.CeilToInt(cam.pixelHeight / 8.0f);
+        int threadGroupsX = Mathf.CeilToInt(cam.pixelWidth / 64.0f);     //CREATING A THREAD FOR EACH PIXEL (/8 AS IT'S *8 IN THE SHADER)
+        int threadGroupsY = Mathf.CeilToInt(cam.pixelHeight / 1.0f);
         fractalShader.Dispatch(handleCSMain, threadGroupsX, threadGroupsY, 1);
 
+        // get minima of groups
+        groupMinBuffer.GetData(groupMinData);
+
+        // find minimum of all groups
+        groupMin = 0;
+        for (int group = 1; group < (cam.pixelHeight + 63) / 64; group++)
+        {
+            if (groupMinData[3 * group + 2] < groupMinData[3 * groupMin + 2])
+            {
+                groupMin = group;
+            }
+        }
+
+
+        print(groupMinData[3 * groupMin + 2]);
+
         Graphics.Blit(target, destination);
+
+        OnDestroy();
     }
 
     void SetParameters () {
@@ -91,13 +123,17 @@ public class FractalMaster : MonoBehaviour
         fractalShader.SetVector ("colourAMix", new Vector3 (redA, greenA, blueA));
         fractalShader.SetVector ("colourBMix", new Vector3 (redB, greenB, blueB));
 
+        fractalShader.SetFloat("minDist", 1000f);
+
         fractalShader.SetMatrix ("_CameraToWorld", cam.cameraToWorldMatrix);
         fractalShader.SetMatrix ("_CameraInverseProjection", cam.projectionMatrix.inverse);
         fractalShader.SetVector ("_LightDirection", directionalLight.transform.forward);
 
+        fractalShader.SetBuffer(handleCSMain, "GroupMinBuffer", groupMinBuffer);
     }
 
-    void InitRenderTexture () {
+    void InitRenderTexture ()
+    {
         if (target == null || target.width != cam.pixelWidth || target.height != cam.pixelHeight)
         {
             if (target != null)
@@ -108,6 +144,14 @@ public class FractalMaster : MonoBehaviour
             target = new RenderTexture (cam.pixelWidth, cam.pixelHeight, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
             target.enableRandomWrite = true;
             target.Create ();
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (null != groupMinBuffer)
+        {
+            groupMinBuffer.Release();
         }
     }
 }
