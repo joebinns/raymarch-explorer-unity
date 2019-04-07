@@ -69,7 +69,7 @@ public class FractalMaster : MonoBehaviour
                 fractalPower += powerIncreaseRate * Time.deltaTime;
             }
 
-            else
+            else if (oscillationRate != 0)
             {
                 t = (t + (Time.deltaTime * oscillationRate)) % (2 * Mathf.PI);
 
