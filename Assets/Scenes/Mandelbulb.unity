@@ -281,7 +281,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fractalShader: {fileID: 7200000, guid: d135fb6523b39409b829979ae009b927, type: 3}
   fractalPower: 5
-  darkness: 70
+  darkness: 50
   drawDistance: 200
   blackAndWhite: 0
   redA: 0
@@ -291,10 +291,65 @@ MonoBehaviour:
   greenB: 0
   blueB: 0
   powerIncreaseRate: 0
-  oscillationRate: 0.1
+  oscillationRate: 0
   oscillationRange: 5
-  groupMinData: 1d0200003d0000006b734943200200007f000000552790431e02000093000000e1484b4320020000d00000008a964a431c0200001c010000b93c49436c01000061010000ef23c93f190200008101000051994a43f8010000fc0100007f51f03fef0100000f02000067a9f23f
-  groupMin: 5
+  groupMinData:
+  - 0
+  - 0
+  - 200
+  - 0
+  - 9e-44
+  - 200
+  - 0
+  - 1.8e-43
+  - 200
+  - 0
+  - 2.69e-43
+  - 200
+  - 0
+  - 3.59e-43
+  - 200
+  - 0
+  - 4.48e-43
+  - 200
+  - 6.1e-43
+  - 6.2e-43
+  - 1.8007706
+  - 6.85e-43
+  - 7e-43
+  - 1.8511708
+  - 7e-43
+  - 7.67e-43
+  - 1.7876441
+  - 6.8e-43
+  - 8.38e-43
+  - 1.8451138
+  - 5.94e-43
+  - 9.51e-43
+  - 1.6410096
+  - 0
+  - 9.87e-43
+  - 200
+  - 0
+  - 1.076e-42
+  - 200
+  - 0
+  - 1.166e-42
+  - 200
+  - 0
+  - 1.256e-42
+  - 200
+  - 0
+  - 1.345e-42
+  - 200
+  - 0
+  - 1.435e-42
+  - 200
+  - 0
+  - 1.525e-42
+  - 200
+  groupMin: 10
+  minDist: 1.6410096
 --- !u!114 &534669907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,15 +357,20 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 534669902}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0866514dc27299442a5c0d6550c5399a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 534669908}
+  minDist: 0
+  maxForVelConst: 0.2
   maxForVel: 0.2
+  maxHorVelIncConst: 0.2
   maxHorVelInc: 0.2
+  maxForVelIncConst: 0.2
   maxForVelInc: 0.2
+  maxVerVelIncConst: 0.2
   maxVerVelInc: 0.2
   maxMouseRateRot: 1
   maxMouseRateRotInc: 0.2

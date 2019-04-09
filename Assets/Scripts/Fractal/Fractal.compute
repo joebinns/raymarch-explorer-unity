@@ -13,8 +13,11 @@ float3 colourAMix;
 float3 colourBMix;
 float maxDst;
 
+int maxStepCount;
+
 static const float epsilon = 0.001f;
-static const int maxStepCount = 250;
+//static const int maxStepCount = 250;
+
 
 struct Ray
 {
@@ -92,8 +95,11 @@ struct minStruct
 	float dMin; // minimum distance
 };
 
+
+
 RWStructuredBuffer<minStruct> GroupMinBuffer;
 groupshared minStruct rowMinData[64];
+
 
 [numthreads(64, 1, 1)]
 void CSMain(uint3 groupID : SV_GroupID,
@@ -107,51 +113,55 @@ void CSMain(uint3 groupID : SV_GroupID,
 	// = SV_GroupID * numthreads + SV_GroupThreadID
 	// id.x specifies the row in the input texture image
 {
-    uint width,height;
-    Destination.GetDimensions(width, height);
+	//if (groupID.x == 8) {
+	//	Destination[id.xy] = float4(1,1,1,1);
+	//}
 
-    float2 uv = id.xy / float2(width,height);
+	uint width, height;
+	Destination.GetDimensions(width, height);
 
-    // Background gradient
-    float4 result = lerp(float4(51, 3, 20, 1), float4(16, 6, 28, 1), uv.y) / 255.0;
-    
-    // Raymarching:
-    Ray ray = CreateCameraRay(uv * 2 - 1);
-    float rayDst = 0;
-    int marchSteps = 0;
+	float2 uv = id.xy / float2(width, height);
 
-    while (rayDst < maxDst && marchSteps < maxStepCount)
+	// Background gradient
+	float4 result = lerp(float4(51, 3, 20, 1), float4(16, 6, 28, 1), uv.y) / 255.0;
+
+	// Raymarching:
+	Ray ray = CreateCameraRay(uv * 2 - 1);
+	float rayDst = 0;
+	int marchSteps = 0;
+
+	while (rayDst < maxDst && marchSteps < maxStepCount)
 	{
-        marchSteps ++;
-        float2 sceneInfo = SceneInfo(ray.origin);
-        float dst = sceneInfo.y;
-        
-        // Ray has hit a surface
-        if (dst <= epsilon) {
-            float escapeIterations = sceneInfo.x;
-            float3 normal = EstimateNormal(ray.origin-ray.direction*epsilon*2);
+		marchSteps++;
+		float2 sceneInfo = SceneInfo(ray.origin);
+		float dst = sceneInfo.y;
 
-            float colourA = saturate(dot(normal*.5+.5,-_LightDirection));
-            float colourB = saturate(escapeIterations/16.0);
-            float3 colourMix = saturate(colourA * colourAMix + colourB * colourBMix);
+		// Ray has hit a surface
+		if (dst <= epsilon) {
+			float escapeIterations = sceneInfo.x;
+			float3 normal = EstimateNormal(ray.origin - ray.direction*epsilon * 2);
 
-            result = float4(colourMix.xyz,1);
-            break;
-        }
+			float colourA = saturate(dot(normal*.5 + .5, -_LightDirection));
+			float colourB = saturate(escapeIterations / 16.0);
+			float3 colourMix = saturate(colourA * colourAMix + colourB * colourBMix);
 
-        ray.origin += ray.direction * dst;
-        rayDst += dst;
-    }
+			result = float4(colourMix.xyz, 1);
+			break;
+		}
 
-    float rim = marchSteps/darkness;
-    Destination[id.xy] = lerp(result, 1, blackAndWhite) * rim;
+		ray.origin += ray.direction * dst;
+		rayDst += dst;
+	}
+
+	float rim = marchSteps / darkness;
+	Destination[id.xy] = lerp(result, 1, blackAndWhite) * rim;
 
 
 	// find the minimum of this row 
-	// and store its data in rowMaxData[groupIndex]
+	// and store its data in rowMinData[groupIndex]
 	rowMinData[groupIndex].xMin = 0;
 	rowMinData[groupIndex].yMin = id.x;
-	rowMinData[groupIndex].dMin = 1000;
+	rowMinData[groupIndex].dMin = maxDst;
 	if (rayDst < rowMinData[groupIndex].dMin)
 	{
 		rowMinData[groupIndex].xMin = id.y;
@@ -197,6 +207,8 @@ void CSMain(uint3 groupID : SV_GroupID,
 		if (rowMinData[groupIndex + 32].dMin < rowMinData[groupIndex].dMin) {
 			rowMinData[groupIndex] = rowMinData[groupIndex + 32];
 		}
+
+
 		GroupMinBuffer[groupID.x] = rowMinData[groupIndex];
 		// copy minimum of group to buffer
 	}

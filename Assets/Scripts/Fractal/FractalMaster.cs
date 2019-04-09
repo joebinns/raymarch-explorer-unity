@@ -32,10 +32,15 @@ public class FractalMaster : MonoBehaviour
 
     private int handleCSMain;
 
-    public uint[] groupMinData;
+    public float[] groupMinData;
     public int groupMin;
 
     private ComputeBuffer groupMinBuffer;
+
+    private int threadGroupsX;
+    private int threadGroupsY;
+
+    public float minDist;
 
     void Start()
     {
@@ -52,12 +57,15 @@ public class FractalMaster : MonoBehaviour
     {
         cam = Camera.current;
         directionalLight = FindObjectOfType<Light> ();
+
+        threadGroupsX = Mathf.CeilToInt(cam.pixelWidth / 64.0f);     //CREATING A THREAD FOR EACH PIXEL (/8 AS IT'S *8 IN THE SHADER)
+        threadGroupsY = Mathf.CeilToInt(cam.pixelHeight / 1.0f);
     }
 
     void InitBuffer()
     {
-        groupMinBuffer = new ComputeBuffer((cam.pixelHeight + 63) / 64, (sizeof(uint) * 2) + (sizeof(float) * 1));
-        groupMinData = new uint[((cam.pixelHeight + 63) / 64) * 3];
+        groupMinBuffer = new ComputeBuffer(threadGroupsX, (sizeof(uint) * 2) + (sizeof(float) * 1));
+        groupMinData = new float[threadGroupsX * 3];
     }
 
     // Animate properties
@@ -88,9 +96,6 @@ public class FractalMaster : MonoBehaviour
 
         SetParameters();
 
-
-        int threadGroupsX = Mathf.CeilToInt(cam.pixelWidth / 64.0f);     //CREATING A THREAD FOR EACH PIXEL (/8 AS IT'S *8 IN THE SHADER)
-        int threadGroupsY = Mathf.CeilToInt(cam.pixelHeight / 1.0f);
         fractalShader.Dispatch(handleCSMain, threadGroupsX, threadGroupsY, 1);
 
         // get minima of groups
@@ -98,7 +103,7 @@ public class FractalMaster : MonoBehaviour
 
         // find minimum of all groups
         groupMin = 0;
-        for (int group = 1; group < (cam.pixelHeight + 63) / 64; group++)
+        for (int group = 1; group < threadGroupsX; group++)
         {
             if (groupMinData[3 * group + 2] < groupMinData[3 * groupMin + 2])
             {
@@ -106,8 +111,10 @@ public class FractalMaster : MonoBehaviour
             }
         }
 
-
-        print(groupMinData[3 * groupMin + 2]);
+        // At the end, the relative luminance of the brightest pixel is at groupMinData[3 * groupMin + 2].
+        // Its x coordinate is at groupMinData[3 * groupMin + 0] and 
+        // its y coordinate is at groupMinData[3 * groupMin + 1]
+        minDist = groupMinData[3 * groupMin + 2];
 
         Graphics.Blit(target, destination);
 
@@ -123,7 +130,7 @@ public class FractalMaster : MonoBehaviour
         fractalShader.SetVector ("colourAMix", new Vector3 (redA, greenA, blueA));
         fractalShader.SetVector ("colourBMix", new Vector3 (redB, greenB, blueB));
 
-        fractalShader.SetFloat("minDist", 1000f);
+        fractalShader.SetInt("maxStepCount", 250);
 
         fractalShader.SetMatrix ("_CameraToWorld", cam.cameraToWorldMatrix);
         fractalShader.SetMatrix ("_CameraInverseProjection", cam.projectionMatrix.inverse);

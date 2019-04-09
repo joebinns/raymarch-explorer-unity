@@ -6,12 +6,20 @@ public class PlayerMovement : MonoBehaviour
 {
     public Rigidbody rigidBody;
 
+    // RAYMARCH STUFF
+    FractalMaster fractalMasterScript;
+    public float minDist;
+
 
     // MOVEMENT STUFF
+    public float maxForVelConst;
     public float maxForVel;
 
+    public float maxHorVelIncConst;
     public float maxHorVelInc;
+    public float maxForVelIncConst;
     public float maxForVelInc;
+    public float maxVerVelIncConst;
     public float maxVerVelInc;
 
     private Vector3 currVelCalc;
@@ -39,7 +47,6 @@ public class PlayerMovement : MonoBehaviour
     //private Vector3 deltaRotation;
 
 
-
     // LERP STUFF
     private bool lerping = true;
     private float currentLerpTime;
@@ -59,15 +66,25 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 startValSlerp;
     private Vector3 endValSlerp;
 
-
     private bool haltHeld;
+
 
     void Start()
     {
+        fractalMasterScript = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<FractalMaster>();
     }
+
 
     void FixedUpdate()
     {
+        minDist = fractalMasterScript.minDist;
+
+        maxForVel = maxForVelConst * minDist;
+        maxHorVelInc = maxHorVelIncConst * minDist;
+        maxForVelInc = maxForVelIncConst * minDist;
+        maxVerVelInc = maxVerVelIncConst * minDist;
+
+
         // ROTATIONS
         currRateRotCalc = transform.InverseTransformDirection(rigidBody.angularVelocity);
 

@@ -41,8 +41,8 @@ InputManager:
     m_Name: LerpButton
     descriptiveName: 
     descriptiveNegativeName: 
-    negativeButton: z
-    positiveButton: 
+    negativeButton: 
+    positiveButton: z
     altNegativeButton: 
     altPositiveButton: 
     gravity: 3
