@@ -9,7 +9,7 @@ public class FractalMaster : MonoBehaviour
     [Range (1, 20)]
     public float fractalPower = 10f;
     public float darkness = 70f;
-    public float drawDistance = 200f;
+    public float drawDistance = 2f;
 
     [Header ("Colour mixing")]
     [Range (0, 1)] public float blackAndWhite;
@@ -41,6 +41,10 @@ public class FractalMaster : MonoBehaviour
     private int threadGroupsY;
 
     public float minDist;
+
+    private int maxStepCount = 250;
+
+    public int maxIterations;
 
     void Start()
     {
@@ -130,7 +134,10 @@ public class FractalMaster : MonoBehaviour
         fractalShader.SetVector ("colourAMix", new Vector3 (redA, greenA, blueA));
         fractalShader.SetVector ("colourBMix", new Vector3 (redB, greenB, blueB));
 
-        fractalShader.SetInt("maxStepCount", 250);
+        fractalShader.SetInt("maxStepCount", maxStepCount);
+
+        maxIterations = Mathf.FloorToInt(5f / minDist);
+        fractalShader.SetInt("maxIterations", maxIterations);
 
         fractalShader.SetMatrix ("_CameraToWorld", cam.cameraToWorldMatrix);
         fractalShader.SetMatrix ("_CameraInverseProjection", cam.projectionMatrix.inverse);
