@@ -282,7 +282,7 @@ MonoBehaviour:
   fractalShader: {fileID: 7200000, guid: d135fb6523b39409b829979ae009b927, type: 3}
   fractalPower: 5
   darkness: 50
-  drawDistance: 200
+  drawDistance: 5
   blackAndWhite: 0
   redA: 0
   greenA: 1
@@ -296,61 +296,62 @@ MonoBehaviour:
   groupMinData:
   - 0
   - 0
-  - 200
+  - 5
   - 0
   - 9e-44
-  - 200
+  - 5
   - 0
   - 1.8e-43
-  - 200
+  - 5
   - 0
   - 2.69e-43
-  - 200
-  - 0
-  - 3.59e-43
-  - 200
+  - 5
+  - 3.81e-43
+  - 4.33e-43
+  - 1.9167075
   - 0
   - 4.48e-43
-  - 200
-  - 5.9e-43
-  - 6.26e-43
-  - 1.5781567
+  - 5
+  - 6.04e-43
+  - 6.2e-43
+  - 1.7961748
+  - 6.82e-43
+  - 7e-43
+  - 1.8459587
   - 7.02e-43
-  - 7.16e-43
-  - 1.894814
-  - 0
-  - 7.17e-43
-  - 200
-  - 0
-  - 8.07e-43
-  - 200
+  - 7.7e-43
+  - 1.7877983
+  - 6.85e-43
+  - 8.35e-43
+  - 1.851951
   - 0
   - 8.97e-43
-  - 200
-  - 0
-  - 9.87e-43
-  - 200
+  - 5
+  - 4.57e-43
+  - 9.94e-43
+  - 1.6548785
   - 0
   - 1.076e-42
-  - 200
+  - 5
   - 0
   - 1.166e-42
-  - 200
+  - 5
   - 0
   - 1.256e-42
-  - 200
+  - 5
   - 0
   - 1.345e-42
-  - 200
+  - 5
   - 0
   - 1.435e-42
-  - 200
+  - 5
   - 0
   - 1.525e-42
-  - 200
-  groupMin: 6
-  minDist: 1.5781567
-  maxIterations: 3
+  - 5
+  groupMin: 11
+  minDist: 1.6548785
+  maxIterations: 15
+  LODChangeWithDist: 0
 --- !u!114 &534669907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -358,7 +359,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 534669902}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0866514dc27299442a5c0d6550c5399a, type: 3}
   m_Name: 
@@ -378,6 +379,7 @@ MonoBehaviour:
   maxHorRateRotInc: 0.2
   lerpTime: 10
   slerpTime: 10
+  SpeedChangeWithDist: 0
 --- !u!54 &534669908
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -401,7 +403,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 534669902}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 041557919f7e9724488fcf3deb5e6689, type: 3}
   m_Name: 

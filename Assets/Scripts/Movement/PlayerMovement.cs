@@ -68,6 +68,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool haltHeld;
 
+    public bool SpeedChangeWithDist;
+
 
     void Start()
     {
@@ -77,7 +79,15 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        minDist = fractalMasterScript.minDist;
+        if (SpeedChangeWithDist)
+        {
+            minDist = fractalMasterScript.minDist;
+        }
+
+        else
+        {
+            minDist = 1.0f;
+        }
 
         maxForVel = maxForVelConst * minDist;
         maxHorVelInc = maxHorVelIncConst * minDist;

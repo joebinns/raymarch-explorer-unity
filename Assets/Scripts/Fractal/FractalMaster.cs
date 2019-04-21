@@ -46,6 +46,9 @@ public class FractalMaster : MonoBehaviour
 
     public int maxIterations;
 
+    public bool LODChangeWithDist;
+
+
     void Start()
     {
         Application.targetFrameRate = 60;
@@ -136,7 +139,12 @@ public class FractalMaster : MonoBehaviour
 
         fractalShader.SetInt("maxStepCount", maxStepCount);
 
-        maxIterations = Mathf.FloorToInt(5f / minDist);
+        if (LODChangeWithDist)
+        {
+            maxIterations = Mathf.FloorToInt(5f / minDist);
+        }
+        else maxIterations = 15;
+
         fractalShader.SetInt("maxIterations", maxIterations);
 
         fractalShader.SetMatrix ("_CameraToWorld", cam.cameraToWorldMatrix);
