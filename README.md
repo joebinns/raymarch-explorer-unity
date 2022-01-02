@@ -1,7 +1,8 @@
-# Fractal-Explorer
-3D fractal explorer prototype in Unity. Works using Raymarching techniques!
-Prototyping possible routes for deep zoom functionalities by passing minimum distance values from compute shader to c# script.
+# Raymarch Explorer (Unity)
+3D fractal explorer prototype in Unity, developed from [Sebastian Lague's Ray-Marching repository](https://github.com/SebLague/Ray-Marching).<br/>
+Prototyping a method for deep zoom functionalities by passing minimum distance values from the compute shader to a C# script.<br/>
+The minimum distance value is used to determine appropriate velocities.<br/>
 
-This has since been abandoned whilst I begin development on a 3D fractal deep zoom explorer using Arbritrary Precision Arithmetics with OpenGL - this does not seem well suited to Unity due to Unitys inbuilt limitations of transform value precision (although haven't fully decided on what platform to build the project yet, may well end up coming back to Unity if I can figure out a work around for the precision limitations).
+The depth of the fractal is stunted by data-type precision. In order to achieve true deep zoom functionality, Arbritrary Preicision Arithmetics is required. Unfortunately, this task does not seem well suited to Unity due to inbuilt limitations on the transform components data-type. The project has therefore been moved to the Lightweight Java Game Library (LWJGL).<br/>
 
-Developed from: https://github.com/SebLague/Ray-Marching
+Checkout the LWJGL repository [here](https://github.com/joebinns/raymarch-explorer-lwjgl).
