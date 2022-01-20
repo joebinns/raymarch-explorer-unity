@@ -1,7 +1,7 @@
 # Raymarch Explorer in Unity
 
 Before you read on, **watch** [Raymarch Explorer in Unity: Mandelbulb Rendered in Real Time](https://youtu.be/3GsXkzbfNBo)!
-[![Raymarch Explorer in Unity: Mandelbulb Rendered in Real Time](https://joebinns.com/documents/fake_thumbnails/raymarch_exlorer_unity_thumbnail_time.png)](https://youtu.be/uKb3W-Hu32U "Raymarch Explorer in Unity: Mandelbulb Rendered in Real Time. Click to Watch")
+[![Raymarch Explorer in Unity: Mandelbulb Rendered in Real Time](https://joebinns.com/documents/fake_thumbnails/raymarch_explorer_unity_thumbnail_time.png)](https://youtu.be/uKb3W-Hu32U "Raymarch Explorer in Unity: Mandelbulb Rendered in Real Time. Click to Watch")
 
 Real-time 3D fractal explorer in Unity. Prototyping a method for deep zoom functionalities by passing minimum distance values from the compute shader to a C\# script. The minimum distance value is used to determine appropriate velocities and level of detail, such as to give the effect of zooming into the fractal surface.
 
